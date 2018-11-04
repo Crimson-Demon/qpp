@@ -20,11 +20,13 @@ class Option : public Security {
 public:
     Option(Security* underlying, Payoff* payoff, double timeToMaturity) : // niech to bedzie friend z optionfactory
             underlying(underlying), payoff(payoff), timeToMaturity(timeToMaturity) { }
-            ~Option() { delete payoff; }
+    OptionRight getRight() const { return payoff->getRight(); }
+    OptionStyle getStyle() const { return payoff->getStyle(); }
+    ~Option() { delete payoff; }
 };
 
 /*
- * Moze bedziemy trzymac shared_ptr payoffow tu, by nie zbednie nie tworzyc nowych
+ * Moze bedziemy trzymac shared_ptr payoffow tu, by nie zbednie tworzyc nowych
  */
 
 class OptionFactory {
