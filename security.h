@@ -4,6 +4,7 @@
 #include <string>
 
 /*
+ * Czy to potrzebne?
 enum class SecurityType {
     EQUITY,
     BOND,

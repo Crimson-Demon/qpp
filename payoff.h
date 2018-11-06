@@ -28,7 +28,7 @@ public:
     Payoff(OptionRight right, OptionStyle style) : right(right), style(style) { }
     OptionStyle getStyle() const { return style; }
     OptionRight getRight() const { return right; }
-    virtual double operator()() = 0;
+    virtual double operator()(double underlying_value) = 0;
 
 //    virtual ~Payoff() = 0;
 };
@@ -36,7 +36,7 @@ public:
 class EuPayoff : public Payoff {
     double strike;
 public:
-    EuPayoff(OptionRight right) : Payoff(right, OptionStyle::EUROPEAN) { }
+    EuPayoff(OptionRight right, double strike) : Payoff(right, OptionStyle::EUROPEAN), strike(strike) { }
     double operator()(double underlying_value) {
         switch(getRight()) {
             case OptionRight::CALL:
