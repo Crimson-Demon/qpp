@@ -4,38 +4,8 @@
 #include <iostream>
 #include "marketmodel.h"
 #include "option.h"
-
-enum class ValuationType { // or should valuations inherit interfaces??
-    ANALYTIC,
-    SIMULATION,
-    PDE
-};
-
-template <typename ModelType, typename OptionType, ValuationType vt>
-class ValuationValue;
-
-template<>
-class ValuationValue<BSModel, EuropeanOption, ValuationType::ANALYTIC> {
-public:
-    static double compute(BSModel& m, EuropeanOption& o) {
-        return 0.0;
-    }
-};
-
-template<>
-class ValuationValue<BSModel, EuropeanOption, ValuationType::SIMULATION> {
-public:
-    static double compute(BSModel& m, EuropeanOption& o) {
-        return 1.0;
-    }
-};
-
-template<>
-class ValuationValue<BSModel, EuropeanOption, ValuationType::PDE> {
-    static double compute(BSModel& m, EuropeanOption& o) {
-        return 2.0;
-    }
-};
+#include "valulationvalue.h"
+#include "utils.h"
 
 class Valuation {
 public:
@@ -45,7 +15,7 @@ public:
 template <typename ModelType, typename OptionType, ValuationType vt>
 class GenericValuation : public Valuation {
 public:
-    double value(MarketModel *m, Option *o) {
+    double value(MarketModel *m, Option *o) final {
         std::cout << "Running base valuation implementation \n";
         auto* cast_m = static_cast<ModelType*>(m);
         auto* cast_o = static_cast<OptionType*>(o);
