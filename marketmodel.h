@@ -10,7 +10,7 @@ public:
     virtual ~MarketModel() = 0;
 };
 
-//inline MarketModel::~MarketModel() {}
+inline MarketModel::~MarketModel() = default;
 
 class BSModel : public MarketModel {
     double rate;

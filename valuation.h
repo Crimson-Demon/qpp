@@ -1,6 +1,7 @@
 #ifndef QPP_VALUATION_H
 #define QPP_VALUATION_H
 
+#include <iostream>
 #include "marketmodel.h"
 #include "option.h"
 
@@ -10,45 +11,57 @@ enum class ValuationType { // or should valuations inherit interfaces??
     PDE
 };
 
-class BSValuation;
+template <typename ModelType, typename OptionType, ValuationType vt>
+class ValuationValue;
 
-template<typename ModelType, typename OptionType>
-class Valuation {
+template<>
+class ValuationValue<BSModel, EuropeanOption, ValuationType::ANALYTIC> {
 public:
-    static double valuate(MarketModel* m, Option* o, ValuationType valuationType) {
-        return BSValuation::valuate(static_cast<ModelType>(m), static_cast<OptionType>(o), valuationType);
+    static double compute(BSModel& m, EuropeanOption& o) {
+        return 0.0;
     }
-private:
-    /**
-     * Here we list the implementations
-     */
-    class BSValuation { // do we need the class wrapper here? seems a bit redundant... ah yes, for scope!
-    public:
-        static double valuate(BSModel* m, Option* o, ValuationType valuationType) {
-            switch(valuationType) {
-                case ValuationType::ANALYTIC:
-                    return BSValuation::cf_valuate(m, o);
-                case ValuationType::SIMULATION:
-                    return BSValuation::mc_valuate(m, o);
-                case ValuationType::PDE:
-                    return BSValuation::pde_valuate(m, o);
-            }
-        }
-    private:
-        static double cf_valuate(BSModel* m, Option* o) {
-            return 1.0;
-        }
-        static double mc_valuate(BSModel* m, Option* o) {
-            return 2.0;
-        }
-        static double pde_valuate(BSModel* m, Option* o) {
-            return 3.0;
-        }
-    };
 };
 
-//inline double valuate(BSModel* m, Option* o, ValuationType valuationType) {
-//    return 2.0;
-//}
+template<>
+class ValuationValue<BSModel, EuropeanOption, ValuationType::SIMULATION> {
+public:
+    static double compute(BSModel& m, EuropeanOption& o) {
+        return 1.0;
+    }
+};
+
+template<>
+class ValuationValue<BSModel, EuropeanOption, ValuationType::PDE> {
+    static double compute(BSModel& m, EuropeanOption& o) {
+        return 2.0;
+    }
+};
+
+class Valuation {
+public:
+    virtual double value(MarketModel *m, Option *o) = 0;
+};
+
+template <typename ModelType, typename OptionType, ValuationType vt>
+class GenericValuation : public Valuation {
+public:
+    double value(MarketModel *m, Option *o) {
+        std::cout << "Running base valuation implementation \n";
+        auto* cast_m = static_cast<ModelType*>(m);
+        auto* cast_o = static_cast<OptionType*>(o);
+        return value(cast_m, cast_o);
+    }
+    double value(ModelType* m, OptionType* o) {
+        std::cout << "Running type correct pointer generic valuation\n";
+        return value(*m, *o);
+    }
+    double value(ModelType& m, OptionType& o) {
+        std::cout << "Running type correct reference generic valuation\n";
+        return ValuationValue<ModelType, OptionType, vt>::compute(m, o);
+    }
+};
+
+template <typename OptionType, ValuationType vt>
+using BSValuation = GenericValuation<BSModel, OptionType, vt>;
 
 #endif //QPP_VALUATION_H
