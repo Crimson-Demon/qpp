@@ -4,7 +4,7 @@
 #include <iostream>
 #include "marketmodel.h"
 #include "option.h"
-#include "valulationvalue.h"
+#include "valuationvalue.h"
 #include "utils.h"
 
 class Valuation {

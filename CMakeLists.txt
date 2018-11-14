@@ -3,4 +3,4 @@ project(qpp)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(qpp main.cpp security.h security.cpp option.h option.cpp payoff.h payoff.cpp marketmodel.h marketmodel.cpp valuation.h)
+add_executable(qpp main.cpp security.h security.cpp option.h option.cpp payoff.h payoff.cpp marketmodel.h marketmodel.cpp valuation.h valuationvalue.h utils.h)

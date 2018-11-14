@@ -1,7 +1,15 @@
 #ifndef QPP_VALULATIONVALUE_H
 #define QPP_VALULATIONVALUE_H
 
-#include "utils.h"
+
+#include "marketmodel.h"
+#include "option.h"
+
+enum class ValuationType { // or should valuations inherit interfaces??
+    ANALYTIC,
+    SIMULATION,
+    PDE
+};
 
 template <typename ModelType, typename OptionType, ValuationType vt>
 class ValuationValue;
@@ -28,6 +36,5 @@ class ValuationValue<BSModel, EuropeanOption, ValuationType::PDE> {
         return 2.0;
     }
 };
-
 
 #endif //QPP_VALULATIONVALUE_H
