@@ -16,7 +16,7 @@ template <typename ModelType, typename OptionType, ValuationType vt>
 class GenericValuation : public Valuation {
 public:
     double value(MarketModel *m, Option *o) final {
-        std::cout << "Running base valuation implementation \n";
+        std::cout << "Running base valuation implementation\n";
         auto* cast_m = static_cast<ModelType*>(m);
         auto* cast_o = static_cast<OptionType*>(o);
         return value(cast_m, cast_o);

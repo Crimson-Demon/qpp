@@ -1,5 +1,5 @@
-#ifndef QPP_VALULATIONVALUE_H
-#define QPP_VALULATIONVALUE_H
+#ifndef QPP_VALUATIONVALUE_H
+#define QPP_VALUATIONVALUE_H
 
 
 #include "marketmodel.h"
@@ -37,4 +37,4 @@ class ValuationValue<BSModel, EuropeanOption, ValuationType::PDE> {
     }
 };
 
-#endif //QPP_VALULATIONVALUE_H
+#endif //QPP_VALUATIONVALUE_H
