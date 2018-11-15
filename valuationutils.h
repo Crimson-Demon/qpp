@@ -28,7 +28,7 @@ public:
 
 class AnalyticParameters : public ValuationParameters {
 public:
-    ValuationType getType() {
+    ValuationType getType() final {
        return ValuationType::ANALYTIC;
     }
 };
@@ -38,7 +38,7 @@ class SimulationParameters : public ValuationParameters {
     MonteCarloEngine* engine;
     SimulationScheme* scheme;
 public:
-    ValuationType getType() {
+    ValuationType getType() final {
         return ValuationType::SIMULATION;
     }
 };
@@ -47,7 +47,7 @@ class PDEParameters : public ValuationParameters {
     NumericScheme* scheme;
     Grid* grid;
 public:
-    ValuationType getType() {
+    ValuationType getType() final {
         return ValuationType::PDE;
     }
 };

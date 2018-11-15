@@ -7,15 +7,15 @@
 #include "valuationutils.h"
 #include "utils.h"
 
-class PricingModel {
+class ValuationModel {
 public:
     virtual double value(MarketModel *m, Option *o, ValuationParameters* v) = 0;
 };
 
 template <typename ModelType, typename OptionType>
-class GenericPricingModel : public PricingModel {
+class GenericValuationModel : public ValuationModel {
 public:
-    double value(MarketModel *m, Option *o, ValuationParameters* v)final {
+    double value(MarketModel *m, Option *o, ValuationParameters* v) final {
         std::cout << "Running base valuation implementation\n";
         auto* cast_m = static_cast<ModelType*>(m);
         auto* cast_o = static_cast<OptionType*>(o);
@@ -45,6 +45,6 @@ public:
 };
 
 template <typename OptionType>
-using BSPricingModel = GenericPricingModel<BSModel, OptionType>;
+using BSValuationModel = GenericValuationModel<BSModel, OptionType>;
 
 #endif //QPP_VALUATION_H

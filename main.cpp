@@ -8,7 +8,7 @@ int main() {
     MarketModel* m = new BSModel(s, 0.05, 0.2);
     Option* o = new EuropeanOption(OptionRight::CALL, s, 1, 100);
     ValuationParameters* vp = new AnalyticParameters();
-    PricingModel* v = new BSPricingModel<EuropeanOption>();
+    ValuationModel* v = new BSValuationModel<EuropeanOption>();
     std::cout << v->value(m, o, vp) << std::endl;
     return 0;
 }
