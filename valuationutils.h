@@ -98,7 +98,7 @@ namespace qpp {
             double d1 = (std::log(m.getSpot(o.getUnderlying()) / o.getStrike()) + (m.getRate() + 0.5 * std::pow(m.getVolatility(), 2)) * o.getTimeToMaturity()) / (m.getVolatility() * std::sqrt(o.getTimeToMaturity()));
             double d2 = d1 - m.getVolatility() * std::sqrt(o.getTimeToMaturity());
             double optionSign = o.getRight() == OptionRight::CALL ? 1.00 : -1.00;
-            return NormalDistribution::std_cdf(optionSign * d1) * m.getSpot(o.getUnderlying()) + optionSign * NormalDistribution::std_cdf(optionSign * d2) * o.getStrike() * std::exp(-m.getRate() * o.getTimeToMaturity());
+            return NormalDistribution::std_cdf(optionSign * d1) * m.getSpot(o.getUnderlying()) + (-optionSign) * NormalDistribution::std_cdf(-optionSign * d2) * o.getStrike() * std::exp(-m.getRate() * o.getTimeToMaturity());
         }
 
         static double compute(BSModel &m, EuropeanOption &o, SimulationParameters &p) {

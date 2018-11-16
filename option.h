@@ -11,6 +11,7 @@ namespace qpp {
         PUT
     };
 
+    // todo: do we need this??
     enum class OptionStyle {
         EUROPEAN,
         AMERICAN,
@@ -51,16 +52,8 @@ namespace qpp {
                 optionRight, underlying, timeToMaturity, strike, OptionStyle::EUROPEAN) {}
 
         double payoff(double value) {
-            double result;
-            switch (getRight()) {
-                case OptionRight::CALL:
-                    result = std::max<double>(value - getStrike(), 0);
-                    break;
-                case OptionRight::PUT:
-                    result = std::max<double>(getStrike() - value, 0);
-                    break;
-            }
-            return result;
+            double sign = getRight() == OptionRight::CALL ? 1.0 : -1.0;
+            return std::max<double>(sign * value + (-sign) * getStrike(), 0);
         }
     };
 
