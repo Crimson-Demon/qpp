@@ -17,10 +17,13 @@ qpp aims to decouple model specific implementations from the model definitions t
 ## Overview
 
 ### Market Models
+* Constant variance Black-Scholes model.
 
 ### Options
+* European option.
 
 ### Option Valuation
+* Closed-form Black-Scholes pricing model implementation.
 
 ### Model Calibration
 
