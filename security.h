@@ -3,6 +3,8 @@
 
 #include <string>
 
+namespace qpp {
+
 /*
  * Czy to potrzebne?
 enum class SecurityType {
@@ -17,12 +19,15 @@ enum class SecurityType {
 };
 */
 
-class Security {
-public:
-    std::string name;
-    Security() : name("Security") { };
-    Security(std::string name) : name(std::move(name)) { };
-};
+    class Security {
+    public:
+        std::string name;
 
+        Security() : name("Security") {};
+
+        Security(std::string name) : name(std::move(name)) {};
+    };
+
+}
 
 #endif //QPP_SECURITY_H
