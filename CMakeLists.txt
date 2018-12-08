@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 #SRC
 set(QPP_SRC
+        qpp.h
         marketmodel.h
         marketmodel.cpp
         option.h
@@ -18,11 +19,13 @@ set(QPP_SRC
         valuation.h
         valuationutils.h
         security.h
-        security.cpp)
+        security.cpp
+        simulationutils.h
+        numericutils.h)
 
 #LIB
 add_library(qpp_lib STATIC ${QPP_SRC})
 
 #EXEC
-add_executable(qpp main.cpp qpp.h)
+add_executable(qpp main.cpp)
 target_link_libraries(qpp Threads::Threads qpp_lib)
