@@ -56,18 +56,26 @@ namespace qpp {
     class ValuationValue<BSModel, EuropeanOption> {
     public:
         static double compute(BSModel &m, EuropeanOption &o, AnalyticParameters &p) {
-            double d1 = (std::log(m.getSpot(o.getUnderlying()) / o.getStrike()) + (m.getRate() + 0.5 * std::pow(m.getVolatility(), 2)) * o.getTimeToMaturity()) / (m.getVolatility() * std::sqrt(o.getTimeToMaturity()));
-            double d2 = d1 - m.getVolatility() * std::sqrt(o.getTimeToMaturity());
+            double spot = m.getSpot(o.getUnderlying()), strike = o.getStrike(), rate = m.getRate(), volatility = m.getVolatility(), timeToMaturity = o.getTimeToMaturity();
+            double d1 = ((std::log(spot) / strike) + (rate + 0.5 * std::pow(volatility, 2)) * timeToMaturity) / (volatility * std::sqrt(timeToMaturity));
+            double d2 = d1 - volatility * std::sqrt(timeToMaturity);
             double optionSign = o.getRight() == OptionRight::CALL ? 1.00 : -1.00;
-            return optionSign * NormalDistribution::std_cdf(optionSign * d1) * m.getSpot(o.getUnderlying()) + (-optionSign) * NormalDistribution::std_cdf(optionSign * d2) * o.getStrike() * std::exp(-m.getRate() * o.getTimeToMaturity());
+            return optionSign * NormalDistribution::std_cdf(optionSign * d1) * spot + (-optionSign) * NormalDistribution::std_cdf(optionSign * d2) * strike * std::exp(-rate * timeToMaturity);
         }
 
         static double compute(BSModel &m, EuropeanOption &o, SimulationParameters &p) {
             MonteCarloEngine* engine = p.getEngine();
             SimulationScheme* scheme = p.getScheme();
             RunSettings* settings = p.getSettings();
-            std::function<double(BaseGenerator*)> callback = [&m, &o, scheme](BaseGenerator *g)->double{ return std::exp(-m.getRate() * o.getTimeToMaturity()) * o.payoff(scheme->trajectory(m.getSDE(), g, m.getSpot(o.getUnderlying()), o.getTimeToMaturity(), p.getSteps())); };
-            MonteCarloJob* job = new MonteCarloJob(callback);
+            double spot = m.getSpot(o.getUnderlying()), rate = m.getRate(), timeToMaturity = o.getTimeToMaturity();
+            uint64_t simulationSteps = p.getSteps();
+            SDE* sde = m.getSDE();
+            std::function<double(BaseGenerator*)> callback =
+                    [rate, timeToMaturity, &o, scheme, sde, spot, simulationSteps](BaseGenerator *g)->double
+                    {
+                        return std::exp(-rate * timeToMaturity) * o.payoff(scheme->trajectory(sde, g, spot, timeToMaturity, simulationSteps));
+                    };
+            auto* job = new MonteCarloJob(callback);
             return engine->run(*job, *settings);
         }
 

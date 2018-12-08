@@ -9,6 +9,10 @@ namespace qpp {
     class BaseGenerator {
     public:
         virtual uint operator()() = 0;
+        virtual void seed() = 0;
+        // todo: those should be static constexpr - check if they wont break
+        virtual uint min() = 0;
+        virtual uint max() = 0;
     };
 
     // todo: add seeding logic
@@ -20,7 +24,15 @@ namespace qpp {
         uint operator()() {
             return generator();
         }
-
+        void seed() {
+            generator.seed();
+        }
+        uint min() {
+            return generator.min();
+        }
+        uint max() {
+            return generator.max();
+        }
     };
 
     // todo: cannot use double/float as template classes, look for reasonable workaround to template with double
