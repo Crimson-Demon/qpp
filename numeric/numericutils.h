@@ -1,5 +1,5 @@
-#ifndef QPP_NUMERICUTILS_HPP
-#define QPP_NUMERICUTILS_HPP
+#ifndef NUMLIB_NUMERICUTILS_H
+#define NUMLIB_NUMERICUTILS_H
 
 namespace qpp {
     class Grid;
@@ -14,4 +14,4 @@ namespace qpp {
     };
 }
 
-#endif //QPP_NUMERICUTILS_HPP
+#endif //NUMLIB_NUMERICUTILS_H

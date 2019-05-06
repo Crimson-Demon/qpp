@@ -20,8 +20,8 @@ set(QPP_SRC
         valuationutils.h
         security.h
         security.cpp
-        simulationutils.h
-        numericutils.h)
+        simulation/simulationutils.h
+        numeric/numericutils.h numeric/numericutils.cpp)
 
 #LIB
 add_library(qpp_lib STATIC ${QPP_SRC})
