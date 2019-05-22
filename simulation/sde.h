@@ -5,8 +5,6 @@
 
 #include "random.h"
 
-// todo: too bad currying doesnt exist here, as an SDESolution is an Generator->Double3Func
-// todo: maybe Ill actually incorporate that observation?!
 typedef std::function<double(double, double, double)> SDEFunction;
 
 // todo: maybe template by return type and vector space or smth like that
@@ -15,12 +13,15 @@ class SDE {
     SDEFunction quadVarFunc;
     SDEFunction driftFunc;
     SDEFunction diffusionFunc;
+    SDEFunction ddxDiffusionFunc;
 public:
-    SDE(SDEFunction solution, SDEFunction quadraticVariation, SDEFunction drift, SDEFunction diffusion) :
+    SDE(SDEFunction solution, SDEFunction quadraticVariation, SDEFunction drift, SDEFunction diffusion,
+        SDEFunction ddxDiffusion) :
             solutionFunc(std::move(solution)),
             quadVarFunc(std::move(quadraticVariation)),
             driftFunc(std::move(drift)),
-            diffusionFunc(std::move(diffusion)) {}
+            diffusionFunc(std::move(diffusion)),
+            ddxDiffusionFunc(std::move(ddxDiffusion)) {};
 
     double solve(double x, double w, double t) { return this->solutionFunc.operator()(x, w, t); }
 
@@ -29,6 +30,8 @@ public:
     double drift(double x, double w, double t) { return this->driftFunc.operator()(x, w, t); }
 
     double diffusion(double x, double w, double t) { return this->diffusionFunc.operator()(x, w, t); }
+
+    double ddx_diffusion(double x, double w, double t) { return this->ddxDiffusionFunc.operator()(x, w, t); }
 };
 
 // todo: if we had a static initialized map from the SDE type to the function instances, that would be nice
@@ -42,7 +45,8 @@ public:
         auto quadVar = [sigma](double x, double w, double t) -> double { return std::pow(sigma * x, 2); };
         auto drift = [mu](double x, double w, double t) -> double { return x * mu; };
         auto diffusion = [sigma](double x, double w, double t) -> double { return x * sigma; };
-        SDE sde(solution, quadVar, drift, diffusion);
+        auto ddxDiffusion = [sigma](double x, double w, double t) -> double { return x * sigma; };
+        SDE sde(solution, quadVar, drift, diffusion, ddxDiffusion);
         return sde;
     }
 };

@@ -31,6 +31,16 @@ public:
     uint max() final { return generator.max(); }
 };
 
+template<typename Generator>
+class GeneratorFactory {
+public:
+    static BaseGenerator *get() {
+        Generator generator(69);
+        BaseGenerator *bg = new GenericGenerator<Generator>(generator);
+        return bg;
+    }
+};
+
 class Distribution {
 public:
     virtual double cdf(double value) = 0;
@@ -50,8 +60,9 @@ public:
                                                        distribution(std::normal_distribution<double>(mean, variance)) {}
 
     // todo: we really need a better approximation for normal_cdf than erf xD
-    static double cdf(double value, double mean, double variance) { return 0.5 * (1 + erf((value - mean) /
-                                                                                          (variance * (M_SQRT1_2))));
+    static double cdf(double value, double mean, double variance) {
+        return 0.5 * (1 + erf((value - mean) /
+                              (variance * (M_SQRT1_2))));
     }
 
     static double std_cdf(double value) { return cdf(value, 0.0, 1.0); }

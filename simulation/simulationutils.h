@@ -5,7 +5,7 @@
 #include <future>
 #include "random.h"
 
-namespace qpp {
+namespace sim {
     enum class RunType {
         CONCURRENT,
         SEQUENTIAL
@@ -26,13 +26,32 @@ namespace qpp {
         uint64_t getPaths() const { return nPaths; }
     };
 
+    class MonteCarloResult {
+        double value;
+        double lowerCI;
+        double upperCI;
+        double alpha;
+    public:
+        MonteCarloResult(double value, double lowerCI, double upperCI, double alpha) :
+                value(value), lowerCI(lowerCI), upperCI(upperCI), alpha(alpha) {}
+
+        double getValue() const { return value; }
+
+        double getLowerCI() const { return lowerCI; }
+
+        double getUpperCI() const { return upperCI; }
+
+        double getAlpha() const { return alpha; }
+
+    };
+
 //    template <typename ResultType>
     class MonteCarloJob {
         std::function<double(BaseGenerator *)> callback;
     public:
         explicit MonteCarloJob(std::function<double(BaseGenerator *)> &callback) : callback(std::move(callback)) {}
 
-        double compute(BaseGenerator *g) const { return callback(g); };
+        double run(BaseGenerator *g) const { return callback(g); };
     };
 
     class MonteCarloEngine {
@@ -41,7 +60,7 @@ namespace qpp {
             switch (settings.getType()) {
                 case RunType::CONCURRENT:
                     return concurrentRun(job, settings.getGenerator(), settings.getPaths());
-                case RunType::SEQUENTIAL:
+                default:
                     return sequentialRun(job, settings.getGenerator(), settings.getPaths());
             }
         }
@@ -51,7 +70,7 @@ namespace qpp {
             std::vector<double> results;
             double localResult, result = 0.0;
             for (uint64_t i = 0; i < nPaths; ++i) {
-                localResult = job.compute(g);
+                localResult = job.run(g);
                 results.push_back(localResult);
                 result += localResult;
             }
@@ -68,7 +87,7 @@ namespace qpp {
             while (i < nPaths) {
                 unsigned j;
                 for (j = 0; j < nPaths && i < nPaths; ++j, ++i) {
-                    jobResults[j] = std::async([&job, g]() -> double { return job.compute(g); });
+                    jobResults[j] = std::async([&job, g]() -> double { return job.run(g); });
                 }
                 for (unsigned k = 0; k < j; ++k) {
                     jobResult = jobResults[k].get();
