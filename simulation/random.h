@@ -17,7 +17,7 @@ namespace rnd {
         virtual uint max() = 0;
     };
 
-// todo: add generic seeding logic
+    // todo: add generic seeding logic
     template<typename Generator>
     class GenericGenerator : public BaseGenerator {
         Generator generator;
@@ -52,7 +52,7 @@ namespace rnd {
         virtual double rand(BaseGenerator *g) = 0;
     };
 
-// Acklam's algorithm
+    // Acklam's algorithm
     double inv_erf(double p) {
         // Coefficients in rational approximations.
         double a[6] = {-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02,
@@ -94,8 +94,8 @@ namespace rnd {
         return x;
     }
 
-// todo: cannot use double/float as template classes, look for reasonable workaround to template with double
-// todo: and how to link this with inheriting from Distribution class
+    // todo: cannot use double/float as template classes, look for reasonable workaround to template with double
+    // todo: and how to link this with inheriting from Distribution class
     class NormalDistribution : public Distribution {
         double mean;
         double variance;
@@ -109,11 +109,11 @@ namespace rnd {
         // todo: we really need a better approximation for normal_cdf than erf xD
         static double cdf(double value, double mean, double variance) {
             return 0.5 * (1 + erf((value - mean) /
-                                  (variance * (M_SQRT1_2))));
+                                  (variance * M_SQRT2)));
         }
 
         static double inv_cdf(double value, double mean, double variance) {
-            return M_SQRT1_2 * variance * inv_erf(2 * value - 1) + mean;
+            return M_SQRT2 * variance * inv_erf(2 * value - 1) + mean;
         }
 
         static double std_cdf(double value) { return cdf(value, 0.0, 1.0); }

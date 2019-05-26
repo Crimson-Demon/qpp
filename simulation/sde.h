@@ -8,7 +8,7 @@ namespace sim {
 
     typedef std::function<double(double, double, double)> SDEFunction;
 
-// todo: maybe template by return type and vector space or smth like that
+    // todo: maybe template by return type and vector space or smth like that
     class SDE {
         SDEFunction solutionFunc;
         SDEFunction quadVarFunc;
@@ -35,8 +35,8 @@ namespace sim {
         double ddx_diffusion(double x, double w, double t) { return this->ddxDiffusionFunc.operator()(x, w, t); }
     };
 
-// todo: if we had a static initialized map from the SDE type to the function instances, that would be nice
-// todo: we could then template using some SDE enum that would be mapped to the functions
+    // todo: if we had a static initialized map from the SDE type to the function instances, that would be nice
+    // todo: we could then template using some SDE enum that would be mapped to the functions
     class SDEFactory {
     public:
         static SDE makeGBM(double mu, double sigma) {
