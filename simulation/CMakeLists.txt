@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(SimLib LANGUAGES CXX VERSION 0.7 DESCRIPTION "A c++ Monte Carlo simulation library")
 
-find_package ( Threads REQUIRED )
+find_package(Threads REQUIRED)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_COMPILER g++-7)
@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 #SRC
-set(SIM_SRC simulationutils.h simulationutils.cpp random.h random.cpp scheme.h scheme.cpp sde.h sde.cpp)
+set(SIM_SRC random.h random.cpp scheme.h scheme.cpp sde.h sde.cpp simulation.cpp simulation.h montecarlo.cpp montecarlo.h)
 
 #LIB
 add_library(SimLib STATIC ${SIM_SRC})
