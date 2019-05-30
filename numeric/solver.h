@@ -2,20 +2,34 @@
 #define NUMLIB_SOLVER_H
 
 #include <vector>
+#include <cmath>
 #include "pde.h"
 #include "fdm.h"
 
 namespace num {
-
     class PDESolver {
     public:
-        static std::vector<double> solve(const pde::PDE *pde, const fdm::FDM *scheme, double t0, const std::vector<double>& x0, double dt, double dx, unsigned steps) {
-            std::vector<double> x = x0;
-            double t = t0;
-            for(unsigned i = 0; i < steps; ++i) {
-                x = scheme->step(t, x, dt, dx);
+        dvec
+        solve(const pde::BoundaryValueProblem &problem, const fdm::FDM *scheme, double tmin, double tmax, unsigned nt,
+              double xmin, double xmax, unsigned nx) {
+            dvec x = linspace(xmin, xmax, nx);
+            for (unsigned i = 0; i <= nx; ++i)
+                x[i] = problem.initialize(x[i]);
+            double t = tmin, dt = (tmax - tmin) / nt, dx = (xmax - xmin) / nx;
+            for (unsigned i = 0; i < nt; ++i) {
+                x = scheme->step(problem, t, x, dt, dx);
+                t += dt;
             }
             return x;
+        }
+
+    private:
+        dvec linspace(double min, double max, unsigned n) const {
+            double d = (max - min) / n;
+            dvec v(n);
+            for (unsigned i = 0; i < n; ++i)
+                v[i] = min + i * d;
+            return v;
         }
     };
 };
