@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <cmath>
+#include <iostream>
 
 #include "pde.h"
 
@@ -14,7 +15,7 @@ namespace fdm {
 
         virtual dvec
         step(const pde::BoundaryValueProblem &problem, const dvec &u0, double t0, const dvec &x0, double dt,
-             double dx) const = 0;
+             double dx, bool verbose) const = 0;
     };
 
     class ExplicitScheme : public FDM {
@@ -25,20 +26,26 @@ namespace fdm {
 
         dvec
         step(const pde::BoundaryValueProblem &problem, const dvec &u0, double t0, const dvec &x0, double dt,
-             double dx) const final {
+             double dx, bool verbose) const final {
             dvec u(u0.size());
             u[0] = problem.left_limit(t0);
+            if (verbose)
+                std::cout << "u0: " << u[0] << std::endl;
             for (unsigned i = 1; i < x0.size() - 1; ++i) {
-                double a = (1 - 2 * dt * problem.get_pde().diffusion(t0, x0[i]) / std::pow(dx, 2));
-                double b = (dt * problem.get_pde().diffusion(t0, x0[i - 1]) / std::pow(dx, 2) +
-                            0.5 * dt * problem.get_pde().drift(t0, x0[i - 1]) / dx);
-                double c = (dt * problem.get_pde().diffusion(t0, x0[i + 1]) / std::pow(dx, 2) -
-                            0.5 * dt * problem.get_pde().drift(t0, x0[i + 1]) / dx);
-                double d = dt * problem.get_pde().source(t0, x0[i]);
+                double a = dt * problem.get_pde().diffusion(t0, x0[i]) / (dx * dx);
+                double b = dt * problem.get_pde().drift(t0, x0[i]) / dx;
+                double coeff1 = (1 - 2 * a);
+                double coeff2 = a + b;
+                double coeff3 = a - b;
+                double sourceTerm = dt * problem.get_pde().source(t0, u0[i]);
 
-                u[i] = a * u0[i] + b * u[i - 1] + c * u[i + 1] + d;
+                u[i] = coeff1 * u0[i] + coeff2 * u0[i + 1] + coeff3 * u0[i - 1] + sourceTerm;
+                if (verbose)
+                    std::cout << "u" << i << ": " << u[i] << std::endl;
             }
             u[x0.size() - 1] = problem.right_limit(t0);
+            if (verbose)
+                std::cout << "u" << x0.size() - 1 << ": " << u[x0.size() - 1] << std::endl;
             return u;
         }
     };
@@ -51,7 +58,7 @@ namespace fdm {
 
         dvec
         step(const pde::BoundaryValueProblem &problem, const dvec &u0, double t0, const dvec &x0, double dt,
-             double dx) const final {
+             double dx, bool verbose) const final {
             dvec u;
             return u;
         }
@@ -65,7 +72,7 @@ namespace fdm {
 
         dvec
         step(const pde::BoundaryValueProblem &problem, const dvec &u0, double t0, const dvec &x0, double dt,
-             double dx) const final {
+             double dx, bool verbose) const final {
             dvec u;
             return u;
         }

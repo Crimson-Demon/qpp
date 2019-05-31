@@ -50,10 +50,10 @@ namespace pde {
 
     class PDEFactory {
     public:
-        static BoundaryValueProblem makeHeatEquation(const std::function<double(double, double)> &diffusion,
-                                                     const std::function<double(double)> &initialValue,
-                                                     const std::function<double(double)> &left,
-                                                     const std::function<double(double)> &right) {
+        static BoundaryValueProblem makeHeatPDE(const std::function<double(double, double)> &diffusion,
+                                                const std::function<double(double)> &initialValue,
+                                                const std::function<double(double)> &left,
+                                                const std::function<double(double)> &right) {
             std::function<double(double, double)> zero = [](double t, double x) -> double { return 0.0; };
             PDE pde(zero, diffusion, zero);
             BoundaryValueProblem problem(pde, initialValue, left, right);
@@ -67,7 +67,7 @@ namespace pde {
             std::function<double(double, double)> diffusion = [v](double t, double s) -> double {
                 return 0.5 * std::pow(v * s, 2);
             };
-            std::function<double(double, double)> source = [r](double t, double s) -> double { return r; };
+            std::function<double(double, double)> source = [r](double t, double v) -> double { return -r * v; };
             PDE pde(drift, diffusion, source);
             BoundaryValueProblem problem(pde, payoff, left, right);
             return problem;
