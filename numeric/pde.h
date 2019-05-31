@@ -5,9 +5,6 @@
 #include <vector>
 #include <cmath>
 
-template<typename T>
-using vec = std::vector<T>;
-
 using dvec = std::vector<double>;
 
 namespace pde {
@@ -52,6 +49,7 @@ namespace pde {
     };
 
     class PDEFactory {
+    public:
         static BoundaryValueProblem makeHeatEquation(const std::function<double(double, double)> &diffusion,
                                                      const std::function<double(double)> &initialValue,
                                                      const std::function<double(double)> &left,

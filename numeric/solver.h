@@ -9,22 +9,29 @@
 namespace num {
     class PDESolver {
     public:
-        dvec
+        static double
         solve(const pde::BoundaryValueProblem &problem, const fdm::FDM *scheme, double tmin, double tmax, unsigned nt,
-              double xmin, double xmax, unsigned nx) {
+              double xmin, double x0, double xmax, unsigned nx) {
             dvec x = linspace(xmin, xmax, nx);
+            dvec u(x.size());
             for (unsigned i = 0; i <= nx; ++i)
-                x[i] = problem.initialize(x[i]);
+                u[i] = problem.initialize(x[i]);
             double t = tmin, dt = (tmax - tmin) / nt, dx = (xmax - xmin) / nx;
             for (unsigned i = 0; i < nt; ++i) {
-                x = scheme->step(problem, t, x, dt, dx);
+                u = scheme->step(problem, u, t, x, dt, dx);
                 t += dt;
             }
-            return x;
+            unsigned i = 0;
+            for (; i < nx; ++i) {
+                if (x[i] > x0)
+                    break;
+            }
+            double l = (x0 - x[i - 1]) / dx;
+            return u[i - 1] + l * (u[i] - u[i - 1]);
         }
 
     private:
-        dvec linspace(double min, double max, unsigned n) const {
+        static dvec linspace(double min, double max, unsigned n) {
             double d = (max - min) / n;
             dvec v(n);
             for (unsigned i = 0; i < n; ++i)
