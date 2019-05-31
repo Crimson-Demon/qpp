@@ -1,17 +1,12 @@
 #ifndef NUMLIB_NUMERICUTILS_H
 #define NUMLIB_NUMERICUTILS_H
 
-namespace qpp {
-    class Grid;
+#include <vector>
+#include <cmath>
+#include <functional>
 
-//    class ComputationScheme {
-//    };
+namespace num {
 
-
-
-    // todo:
-    class NumericScheme /* :public ComputationScheme*/ {
-    };
 }
 
 #endif //NUMLIB_NUMERICUTILS_H
