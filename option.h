@@ -2,72 +2,41 @@
 #define QPP_OPTION_H
 
 #include "security.h"
-//#include "payoff.h"
+#include "payoff.h"
 
 namespace qpp {
-
-    enum class OptionRight {
-        CALL,
-        PUT
-    };
-
-    // todo: do we need this??
-    enum class OptionStyle {
-        EUROPEAN,
-        AMERICAN,
-        BERMUDAN,
-        ASIAN,
-        EXOTIC
-    };
-
-// IDEA? Maybe I should template the option with the payoff (and keep the boons of compostion, decouple the class a bit and use templated option classes in the signature of valuation implementations?
     class Option : public Security {
-        OptionRight right;
-        Security *underlying; // should this be here or in the model?
+        Security *underlying;
         double timeToMaturity;
         double strike;
-        OptionStyle style;
+        Payoff *payoff;
 
     public:
-        Option(OptionRight optionRight, Security *underlying, double timeToMaturity, double strike, OptionStyle style)
-                : Security("Option"), right(optionRight), underlying(underlying), timeToMaturity(timeToMaturity),
-                  strike(strike), style(style) {}
+        Option(Security *underlying, double timeToMaturity, double strike, Payoff *payoff)
+                : Security("Option"), underlying(underlying), timeToMaturity(timeToMaturity), strike(strike),
+                  payoff(payoff) {}
 
-        OptionRight getRight() const { return right; }
+        ~Option() { delete payoff; }
 
-        OptionStyle getStyle() const { return style; }
+        OptionRight get_right() const { return payoff->get_right(); }
 
-        double getTimeToMaturity() const { return timeToMaturity; }
+        OptionStyle get_style() const { return payoff->get_style(); }
 
-        double getStrike() const { return strike; }
+        double get_time_to_maturity() const { return timeToMaturity; }
 
-        Security *getUnderlying() const { return underlying; }
+        double get_strike() const { return strike; }
 
-        virtual double payoff(double value) = 0;
+        Security *get_underlying() const { return underlying; }
+
+        Payoff *get_payoff() const { return payoff; }
     };
 
-    class EuropeanOption : public Option {
+    class OptionFactory {
     public:
-        EuropeanOption(OptionRight optionRight, Security *underlying, double timeToMaturity, double strike) : Option(
-                optionRight, underlying, timeToMaturity, strike, OptionStyle::EUROPEAN) {}
-
-        double payoff(double value) {
-            double sign = getRight() == OptionRight::CALL ? 1.0 : -1.0;
-            return std::max<double>(sign * value + (-sign) * getStrike(), 0);
+        static Option get_eu_option(OptionRight right, Security *sec, double ttm, double strike) {
+            return Option(sec, ttm, strike, new EuPayoff(right, strike));
         }
     };
-
-/*
- * Moze bedziemy trzymac shared_ptr payoffow tu, by nie zbednie tworzyc nowych przy budowaniu opcji?
- */
-
-/*
-class OptionFactory {
-};
-
-class OptionBuilder {
-};
-*/
 
 }
 

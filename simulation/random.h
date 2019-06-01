@@ -7,6 +7,8 @@ namespace rnd {
 
     class BaseGenerator {
     public:
+        virtual ~BaseGenerator() = default;
+
         virtual uint operator()() = 0;
 
         virtual void seed(unsigned long seed) = 0;
@@ -17,12 +19,16 @@ namespace rnd {
         virtual uint max() = 0;
     };
 
+    using GenPtr = std::shared_ptr<BaseGenerator>;
+
     // todo: add generic seeding logic
     template<typename Generator>
     class GenericGenerator : public BaseGenerator {
         Generator generator;
     public:
         GenericGenerator(Generator &g) : generator(g) {}
+
+        ~GenericGenerator() = default;
 
         uint operator()() final { return generator(); }
 
@@ -45,6 +51,8 @@ namespace rnd {
 
     class Distribution {
     public:
+        virtual ~Distribution() = default;
+
         virtual double cdf(double value) = 0;
 
         virtual double inv_cdf(double value) = 0;
@@ -105,6 +113,8 @@ namespace rnd {
         NormalDistribution(double mean, double variance) : mean(mean), variance(variance),
                                                            distribution(
                                                                    std::normal_distribution<double>(mean, variance)) {}
+
+        ~NormalDistribution() = default;
 
         // todo: we really need a better approximation for normal_cdf than erf xD
         static double cdf(double value, double mean, double variance) {

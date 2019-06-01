@@ -26,7 +26,7 @@ namespace sim {
 
         double solve(double x, double w, double t) { return this->solutionFunc.operator()(x, w, t); }
 
-        double quadVar(double x, double w, double t) { return this->quadVarFunc.operator()(x, w, t); }
+        double quad_var(double x, double w, double t) { return this->quadVarFunc.operator()(x, w, t); }
 
         double drift(double x, double w, double t) { return this->driftFunc.operator()(x, w, t); }
 

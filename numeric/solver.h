@@ -7,11 +7,42 @@
 #include "fdm.h"
 
 namespace num {
+    class SolverSettings {
+        fdm::FDM *scheme;
+        double tmin;
+        double tmax;
+        unsigned nt;
+        double xmin;
+        double x0;
+        double xmax;
+        double nx;
+    public:
+//        SolverSettings() = default;
+        SolverSettings(double tmin, double tmax, unsigned nt, double xmin, double x0, double xmax, unsigned nx) : tmin(
+                tmin), tmax(tmax), nt(nt), xmin(xmin), x0(x0), xmax(xmax), nx(nx) {
+            scheme = new fdm::ExplicitScheme();
+        }
+
+        ~SolverSettings() { delete scheme; }
+
+        fdm::FDM *get_scheme() const { return scheme; }
+
+        std::tuple<double, double, unsigned> get_time_specs() const {
+            return std::make_tuple(tmin, tmax, nt);
+        }
+
+        std::tuple<double, double, double, unsigned> get_space_specs() const {
+            return std::make_tuple(xmin, x0, xmax, nx);
+        }
+    };
+
     class PDESolver {
     public:
         static double
-        solve(const pde::BoundaryValueProblem &problem, const fdm::FDM *scheme, double tmin, double tmax, unsigned nt,
-              double xmin, double x0, double xmax, unsigned nx, bool verbose) {
+        solve(const pde::BoundaryValueProblem &problem, SolverSettings &settings, bool verbose) {
+            auto *scheme = settings.get_scheme();
+            auto[tmin, tmax, nt] = settings.get_time_specs();
+            auto[xmin, x0, xmax, nx] = settings.get_space_specs();
             dvec x = linspace(xmin, xmax, nx, verbose);
             dvec u(x.size());
             if (verbose)
@@ -22,7 +53,6 @@ namespace num {
                     std::cout << "u" << i << ": " << u[i] << std::endl;
             }
             double t = tmin, dt = (tmax - tmin) / nt, dx = (xmax - xmin) / nx, l = dt / (dx * dx);
-            std::cout << "l = " << l << std::endl;
             if (verbose)
                 std::cout << "dt = " << dt << ", dx = " << dx << ", l = " << l << std::endl;
             for (unsigned i = 0; i < nt; ++i) {

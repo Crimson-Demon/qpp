@@ -5,28 +5,32 @@
 #include <map>
 
 #include "security.h"
-#include "simulation/simulationutils.h"
+#include "simulation/sde.h"
+#include "valuationutils.h"
+#include "option.h"
+#include "simulation/random.h"
 
 namespace qpp {
 
-    // todo: the sde isnt very practically placed here
-    // todo: need a better interface for it
     class MarketModel {
         std::map<Security *, double> spotMap;
-        SDE* sde;
     public:
-        MarketModel(SDE* sde) : sde(sde) { }
-        void addSecurity(Security *security, double spot) {
+        MarketModel() = default;
+
+        void add_security(Security *security, double spot) {
             spotMap.insert(std::make_pair(security, spot));
         }
-        bool hasSecurity(Security *security) const {
+
+        bool has_security(Security *security) const {
             return spotMap.find(security) != spotMap.end();
         }
-        double getSpot(Security *security) const {
+
+        double get_spot(Security *security) const {
             return spotMap.at(security);
         }
-        void removeSecurity(Security *security) { spotMap.erase(security); }
-        SDE* getSDE() const { return sde; }
+
+        void remove_security(Security *security) { spotMap.erase(security); }
+
         virtual ~MarketModel() = 0;
     };
 
@@ -36,9 +40,11 @@ namespace qpp {
         double rate;
         double volatility;
     public:
-        BSModel(double rate, double volatility) : MarketModel(new GBM(rate, volatility)), rate(rate), volatility(volatility) { };
-        double getRate() const { return rate; }
-        double getVolatility() const { return volatility; }
+        BSModel(double rate, double volatility) : MarketModel(), rate(rate), volatility(volatility) {};
+
+        double get_rate() const { return rate; }
+
+        double get_vol() const { return volatility; }
     };
 }
 

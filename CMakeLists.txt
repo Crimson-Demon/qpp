@@ -3,7 +3,7 @@ project(qpp LANGUAGES CXX VERSION 0.7 DESCRIPTION "A c++ quant library")
 
 find_package ( Threads REQUIRED )
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_COMPILER g++-7)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -DDEBUG")
@@ -14,14 +14,15 @@ set(QPP_SRC
         qpp.h
         marketmodel.h
         marketmodel.cpp
+        payoff.h
+        payoff.cpp
         option.h
         option.cpp
         valuation.h
+        valuation.cpp
         valuationutils.h
         security.h
-        security.cpp
-        simulation/simulationutils.h
-        numeric/numericutils.h numeric/numericutils.cpp)
+        security.cpp)
 
 #LIB
 add_library(qpp_lib STATIC ${QPP_SRC})

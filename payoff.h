@@ -19,30 +19,34 @@ enum class OptionRight {
 };
 
 class Payoff {
-//    std::function<double(std::unordered_map<string, double>)> func;
-//    std::unordered_map<std::string, double> params;
     OptionStyle style;
     OptionRight right;
 
 public:
-    Payoff(OptionRight right, OptionStyle style) : right(right), style(style) { }
-    OptionStyle getStyle() const { return style; }
-    OptionRight getRight() const { return right; }
-    virtual double operator()(double underlying_value) = 0;
+    Payoff(OptionRight right, OptionStyle style) : style(style), right(right) {}
 
-//    virtual ~Payoff() = 0;
+    virtual ~Payoff() = default;
+
+    OptionStyle get_style() const { return style; }
+
+    OptionRight get_right() const { return right; }
+
+    virtual double operator()(double val) = 0;
 };
 
 class EuPayoff : public Payoff {
     double strike;
 public:
-    EuPayoff(OptionRight right, double strike) : Payoff(right, OptionStyle::EUROPEAN), strike(strike) { }
-    double operator()(double underlying_value) {
-        switch(getRight()) {
+    EuPayoff(OptionRight right, double strike) : Payoff(right, OptionStyle::EUROPEAN), strike(strike) {}
+
+    double operator()(double val) {
+        switch (get_right()) {
             case OptionRight::CALL:
-                return std::max<double>(underlying_value - strike, 0);
+                return std::max<double>(val - strike, 0);
             case OptionRight::PUT:
-                return std::max<double>(strike - underlying_value, 0);
+                return std::max<double>(strike - val, 0);
+            default:
+                return 0.0;
         }
     }
 };

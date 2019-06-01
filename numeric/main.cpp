@@ -8,9 +8,9 @@ int main() {
 
     bool verbose = false;
 
-    double s0 = 20, K = 10, r = 0.1, v = 0.4, tmin = 1, tmax = 0;
+    double s0 = 20, K = 10, r = 0.05, v = 0.25, tmin = 1, tmax = 0;
     double smin = 10, smax = 500;
-    unsigned nt = 100000, ns = 500;
+    unsigned nt = 100000, ns = 1000;
     std::function<double(double)> payoff = [K](double s) -> double { return std::max(s - K, 0.0); };
     std::function<double(double)> left = [](double t) -> double { return 0; };
     std::function<double(double)> right = [smax, K, r, tmin](double t) -> double {

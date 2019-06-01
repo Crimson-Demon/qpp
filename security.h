@@ -23,7 +23,7 @@ enum class SecurityType {
     public:
         std::string name;
 
-        Security() : name("Security") { };
+        Security() : name("Security") {};
 
         explicit Security(std::string name) : name(std::move(name)) {};
     };

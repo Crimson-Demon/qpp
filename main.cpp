@@ -1,20 +1,19 @@
 #include <iostream>
-//#include "marketmodel.h"
-//#include "option.h"
-//#include "security.h"
-//#include "valuation.h"
 #include "qpp.h"
 
 int main() {
 
-    Security* s = new Security("Sec1");
-//    Security* s2 = new Security("Sec2");
-    MarketModel* m = new BSModel(0.05, 0.2);
-    m->addSecurity(s, 100);
-    Option* o = new EuropeanOption(OptionRight::CALL, s, 1, 100);
-    ValuationParameters* vp = new AnalyticParameters();
-    ValuationModel* v = new BSValuationModel<EuropeanOption>();
-    std::cout << v->value(m, o, vp) << std::endl;
-//    std::cout << NormalDistribution::cdf(0, 0.0, 1.0) << std::endl;
+    Security *s = new Security("Sec1");
+    BSModel m(0.05, 0.2);
+    m.add_security(s, 100);
+    double ttm = 1, strike = 100;
+    Option o = OptionFactory::get_eu_option(OptionRight::CALL, s, ttm, strike);
+    CFParameters cfp;
+    MCParameters mcp;
+    PDEParameters pdep;
+    std::cout << value(m, o, cfp) << std::endl;
+    std::cout << value(m, o, mcp) << std::endl;
+    std::cout << value(m, o, pdep) << std::endl;
+    delete s;
     return 0;
 }

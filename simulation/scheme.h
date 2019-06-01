@@ -11,7 +11,10 @@
 namespace sim {
     class Scheme {
     public:
+        virtual ~Scheme() = default;
+
         virtual double step(SDE sde, double x, double w, double dt) = 0;
+
     };
 
     class DirectScheme : public Scheme {

@@ -14,22 +14,32 @@ namespace mc {
 
     class RunSettings {
         RunType type;
-        rnd::BaseGenerator *generator;
-        uint64_t nPaths;
+        rnd::GenPtr generator;
+        unsigned long seed;
+        uint64_t paths;
         double alpha;
 
     public:
-        RunSettings(RunType type, rnd::BaseGenerator *g, uint64_t nPaths, double alpha) : type(type), generator(g),
-                                                                                          nPaths(nPaths),
-                                                                                          alpha(alpha) {}
+        RunSettings() {
+            type = RunType::SEQUENTIAL;
+            generator = rnd::GenPtr(rnd::GeneratorFactory<std::mt19937>::get());
+            seed = 69;
+            paths = 10000;
+            alpha = 0.95;
+        }
 
-        RunType getType() const { return type; }
+        RunSettings(RunType type, rnd::BaseGenerator *g, unsigned long seed, uint64_t nPaths, double alpha) :
+                type(type), generator(g), seed(seed), paths(nPaths), alpha(alpha) {}
 
-        rnd::BaseGenerator *getGenerator() const { return generator; }
+        RunType get_type() const { return type; }
 
-        uint64_t getPaths() const { return nPaths; }
+        rnd::GenPtr get_generator() const { return generator; }
 
-        double getAlpha() const { return alpha; }
+        unsigned long get_seed() const { return seed; }
+
+        uint64_t get_paths() const { return paths; }
+
+        double get_alpha() const { return alpha; }
     };
 
     class MonteCarloResult {
@@ -42,13 +52,20 @@ namespace mc {
                                   std::chrono::duration<long int, std::ratio<1, 1000>> duration) :
                 value(value), lowerCI(lowerCI), upperCI(upperCI), duration(duration) {}
 
-        double getValue() const { return value; }
+        double get_value() const { return value; }
 
-        double getLowerCI() const { return lowerCI; }
+        double get_lower_CI() const { return lowerCI; }
 
-        double getUpperCI() const { return upperCI; }
+        double get_upper_CI() const { return upperCI; }
 
-        std::chrono::duration<long int, std::ratio<1, 1000>> getDuration() const { return duration; }
+        std::chrono::duration<long int, std::ratio<1, 1000>> get_duration() const { return duration; }
+
+        std::string to_string() const {
+            std::string s;
+            s += "{MCResult: {value: " + std::to_string(value) + "}, lowerCI: " + std::to_string(lowerCI) +
+                 "}, upperCI: " + std::to_string(upperCI) + "}, duration: " + std::to_string(duration.count()) + "}}";
+            return s;
+        }
 
     };
 
@@ -64,18 +81,21 @@ namespace mc {
     public:
         static MonteCarloResult run(MonteCarloJob &job, RunSettings &settings) {
             std::vector<double> runResults;
-            unsigned paths = settings.getPaths();
+            unsigned paths = settings.get_paths();
             auto start = std::chrono::steady_clock::now();
-            switch (settings.getType()) {
+            auto seed = settings.get_seed();
+            auto generator = settings.get_generator();
+            generator->seed(seed);
+            switch (settings.get_type()) {
                 case RunType::CONCURRENT:
-                    runResults = concurrentRun(job, settings.getGenerator(), paths);
+                    runResults = concurrent_run(job, generator.get(), paths);
                 default:
-                    runResults = sequentialRun(job, settings.getGenerator(), paths);
+                    runResults = sequential_run(job, generator.get(), paths);
             }
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::steady_clock::now() - start);
 
-            double alpha = settings.getAlpha();
+            double alpha = settings.get_alpha();
             double a = std::accumulate(runResults.begin(), runResults.end(), 0.0) / paths;
             double b2 = std::accumulate(runResults.begin(), runResults.end(), 0.0,
                                         [a](double acc, double val) -> double { return acc + std::pow(val - a, 2); }) /
@@ -89,7 +109,7 @@ namespace mc {
         }
 
     private:
-        std::vector<double> static sequentialRun(MonteCarloJob &job, rnd::BaseGenerator *g, uint64_t nPaths) {
+        std::vector<double> static sequential_run(MonteCarloJob &job, rnd::BaseGenerator *g, uint64_t nPaths) {
             std::vector<double> results;
             double localResult;
             for (uint64_t i = 0; i < nPaths; ++i) {
@@ -99,7 +119,7 @@ namespace mc {
             return results;
         }
 
-        std::vector<double> static concurrentRun(MonteCarloJob &job, rnd::BaseGenerator *g, uint64_t nPaths) {
+        std::vector<double> static concurrent_run(MonteCarloJob &job, rnd::BaseGenerator *g, uint64_t nPaths) {
             std::future<double> jobResults[nPaths];
             double jobResult;
             std::vector<double> results;
